@@ -1,0 +1,2 @@
+# Nixpacks configuration for Python on Railway
+providers = ["python"]
