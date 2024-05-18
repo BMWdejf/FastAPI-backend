@@ -1,6 +1,7 @@
 import requests
 import os
 from dotenv import load_dotenv
+from app.db.flexibee_data import get_data
 
 load_dotenv()
 
@@ -11,12 +12,9 @@ def get_urls():
 
     max_id = data[0]["id"]
 
-    # Create an empty list to store the URLs
-    urls =[]
-
-    for id_value in range(1, int(max_id) + 1):
+    for id_value in range(1, 10 + 1):
         url = f"https://sas-technologi.flexibee.eu:5434/c/einteriors_s_r_o_/cenik/{id_value}.json?detail=custom:id,kod,nazev,exportNaEshop,prilohy(nazSoub,%20content,%20link,%20typK)&relations=prilohy"
-        # Add the URL to the list
-        urls.append(url)
+        get_data(url)
 
-    return urls # Return the list with the URLs
+if __name__ == "__main__":
+    get_urls()
