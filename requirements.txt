@@ -5,3 +5,4 @@ supabase==2.4.5
 requests
 python-dotenv
 sqlalchemy
+psycopg2-binary
