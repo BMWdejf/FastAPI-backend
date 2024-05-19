@@ -6,6 +6,8 @@ import functools
 import time
 from typing import Callable, Any
 import asyncio
+from app.models.models import Products
+from app.db.base import SessionLocal
 
 load_dotenv()
 
@@ -38,7 +40,7 @@ async def get_urls():
     requests_data = []
     last_index = 1
     try:
-        for id_value in range(1, 10 + 1):
+        for id_value in range(1, 1 + 1):
             last_index = id_value
             url = f"https://sas-technologi.flexibee.eu:5434/c/einteriors_s_r_o_/cenik/{id_value}.json?detail=custom:id,kod,nazev,exportNaEshop,prilohy(nazSoub,%20content,%20link,%20typK)&relations=prilohy"
             requests_data.append(get_data(url))
@@ -47,8 +49,22 @@ async def get_urls():
         #print(requests_data)
         results = await asyncio.gather(*requests_data)
 
-        for row in results:
-            print(row)
+        print(results[0])
+
+        for item in results:
+            export_on_eshop = 'True' if item['exportNaEshop'] == 'true' else 'False'
+            product = Products(
+                fx_id=item['id'],
+                code=item['kod'],
+                name=item['nazev'],
+                exportOnEshop=export_on_eshop,
+                link=item['prilohy'][0]['link'] if 'prilohy' in item and item['prilohy'] else None
+            )
+            db = SessionLocal()
+            db.add(product)
+
+        db.commit()
+
     except Exception as e:
         print(e)
         print(last_index)
