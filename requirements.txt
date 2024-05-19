@@ -4,3 +4,4 @@ python-decouple==3.8
 supabase==2.4.5
 requests
 python-dotenv
+sqlalchemy
