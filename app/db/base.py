@@ -20,7 +20,7 @@ def get_db():
     finally:
         db.close()
 
-print("Existující tabulky v databázi:")
-for table in metadata.tables.values():
-    print(table.name)
-    print(table.columns)
+#print("Existující tabulky v databázi:")
+#for table in metadata.tables.values():
+#    print(table.name)
+#    print(table.columns)
