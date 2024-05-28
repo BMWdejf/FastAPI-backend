@@ -8,6 +8,7 @@ from typing import Callable, Any
 import asyncio
 from app.models.models import Products
 from app.db.base import SessionLocal
+import re
 
 load_dotenv()
 
@@ -28,6 +29,11 @@ def async_timed():
 
     return wrapper
 
+def extract_drive_id(link):
+    pattern = r"https://drive\.google\.com/file/d/([^/]+)/view\?usp=share_link"
+    match = re.search(pattern, link)
+    return match.group(1) if match else None
+
 @async_timed()
 async def get_urls():
     auth = (os.getenv("FLEXB_USER"), os.getenv("FLEXB_PASS"))
@@ -40,7 +46,7 @@ async def get_urls():
     requests_data = []
     last_index = 1
     try:
-        for id_value in range(1, 1 + 1):
+        for id_value in range(6328, int(max_id) + 1):
             last_index = id_value
             url = f"https://sas-technologi.flexibee.eu:5434/c/einteriors_s_r_o_/cenik/{id_value}.json?detail=custom:id,kod,nazev,exportNaEshop,prilohy(nazSoub,%20content,%20link,%20typK)&relations=prilohy"
             requests_data.append(get_data(url))
@@ -49,21 +55,44 @@ async def get_urls():
         #print(requests_data)
         results = await asyncio.gather(*requests_data)
 
-        print(results[0])
+        #print(results)
 
-        for item in results:
-            export_on_eshop = 'True' if item['exportNaEshop'] == 'true' else 'False'
-            product = Products(
-                fx_id=item['id'],
-                code=item['kod'],
-                name=item['nazev'],
-                exportOnEshop=export_on_eshop,
-                link=item['prilohy'][0]['link'] if 'prilohy' in item and item['prilohy'] else None
-            )
-            db = SessionLocal()
-            db.add(product)
+        db = SessionLocal()  # Start database session
+        for item_list in results:
+            for item in item_list:
+                export_on_eshop = item['exportNaEshop'] == 'true'
+                link = item['prilohy'][0]['link'] if 'prilohy' in item and item['prilohy'] else None
+                drive_id = extract_drive_id(link) if link else None
+
+                #print(f"Original link: {link}")
+                #print(f"Extracted drive_id: {drive_id}")
+
+                existing_product = db.query(Products).filter_by(fx_id=item['id']).first()
+
+                if export_on_eshop:
+                    if existing_product:
+                        # Update existing product
+                        existing_product.code = item['kod']
+                        existing_product.name = item['nazev']
+                        existing_product.exportOnEshop = 1
+                        existing_product.link = drive_id
+                    else:
+                        # Add new product
+                        product = Products(
+                            fx_id=item['id'],
+                            code=item['kod'],
+                            name=item['nazev'],
+                            exportOnEshop=1,
+                            link=drive_id
+                        )
+                        db.add(product)
+                else:
+                    if existing_product:
+                        # Delete product if exportNaEshop is false
+                        db.delete(existing_product)
 
         db.commit()
+        db.close()
 
     except Exception as e:
         print(e)
