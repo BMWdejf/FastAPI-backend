@@ -1,5 +1,4 @@
 from fastapi import FastAPI
-from app.schemas.schemas import products
 
 app = FastAPI()
 
@@ -9,4 +8,4 @@ async def root():
 
 @app.get("/products")
 def get_products():
-    return products()
+    pass
