@@ -24,6 +24,7 @@ async def import_products_endpoint(user: str = Depends(get_current_user)):
     await import_products()
     return {"message": "Products imported successfully"}
 
+
 @app.get("/products")
 async def get_products(db: Session = Depends(get_db)):
     products = db.query(Products).all()
