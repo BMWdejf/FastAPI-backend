@@ -31,3 +31,11 @@ async def get_products(db: Session = Depends(get_db)):
     get_products = [{"fx_id": product.fx_id, "code": product.code, "name": product.name, "link": product.link} for
                          product in products]
     return get_products
+
+@app.get("/product/{id}")
+async def get_product_by_fx_id(id: str, db: Session = Depends(get_db)):
+    product = db.query(Products).filter(Products.fx_id == id).first()
+    get_product = {"id": product.fx_id, "code": product.code, "name": product.name, "link": product.link}
+    if get_product is None:
+        raise HTTPException(status_code=404, detail="Product not found")
+    return get_product
