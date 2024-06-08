@@ -35,7 +35,7 @@ def extract_drive_id(link):
     return match.group(1) if match else None
 
 @async_timed()
-async def get_urls():
+async def import_products():
     auth = (os.getenv("FLEXB_USER"), os.getenv("FLEXB_PASS"))
     response = requests.get("https://sas-technologi.flexibee.eu:5434/c/einteriors_s_r_o_/cenik.json?detail=custom:id&limit=1&order=id@D", auth=auth)
     data = response.json()['winstrom']['cenik']
@@ -99,4 +99,4 @@ async def get_urls():
         print(last_index)
 
 if __name__ == "__main__":
-    asyncio.run(get_urls())
+    asyncio.run(import_products())
