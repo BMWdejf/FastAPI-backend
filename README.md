@@ -1,7 +1,8 @@
 # FastAPI 
 
 ### Description
-REST API for processing data from external chanels 
+REST API for processing data from external REST API (Flexibee) and forwards them processed 
+further to frontend and backend app
 
 ## Get code
 For get this code from repository to your local pc you can use this steps: 
@@ -49,7 +50,7 @@ if all work correctly open link in your browser
 you must get 
 
 ```json
-{"message":"Hello from FastAPI!"}
+{"message":"FastAPI works!"}
 ```
 ## Deploy on Railway
 if the first tine deploying on Railway.app you need install Railway CLI to your PC.
@@ -77,7 +78,7 @@ follow the instructions until successful login.
 
 now you must create a new project 
 ```bash
-railway init -n <your-project-name>
+railway init -n fastapi-backend-3
 ```
 now is last step for deploying your first app to Railway.app
 ```bash
