@@ -7,7 +7,7 @@ from app.utils.deps import get_user_service
 from app.utils.exceptions import InvalidData, EmailDuplicationException, UsernameDuplicationException, UserNotFoundException
 from app.utils.jwt_token import create_access_token
 from app.utils.user import get_current_user
-from app.db.flexibee_api_url import import_products
+from app.services.flexibee_import_products import import_products
 from sqlalchemy.orm import Session
 from app.db.base import get_db
 from sqlalchemy.exc import NoResultFound
