@@ -1,7 +1,6 @@
 import json
-from fastapi import FastAPI, Depends, HTTPException, status, Response
+from fastapi import FastAPI, Depends, HTTPException, status, Response, APIRouter
 from contextlib import asynccontextmanager
-
 from app.schemas.schemas import CreateUserSchema, LoginSchema
 from app.services.user_service import UserService
 from app.utils.deps import get_user_service
@@ -20,8 +19,9 @@ async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan)
+router = APIRouter()
 
-@app.post("/login")
+@router.post("/login")
 async def login(*, user_service: UserService = Depends(get_user_service), request: LoginSchema):
     try:
         user = await user_service.login(request)
@@ -46,7 +46,7 @@ async def login(*, user_service: UserService = Depends(get_user_service), reques
         })
 
 
-@app.post("/users", response_class=Response, status_code=status.HTTP_201_CREATED)
+@router.post("/users", response_class=Response, status_code=status.HTTP_201_CREATED)
 async def create_user(*, user_service: UserService = Depends(get_user_service), request: CreateUserSchema):
     try:
         await user_service.create_user(request)
@@ -78,23 +78,26 @@ async def create_user(*, user_service: UserService = Depends(get_user_service), 
         })
 
 
-@app.get("/import_products")
+@router.get("/import_products")
 async def import_products_endpoint(_: str = Depends(get_current_user)):
     await import_products()
     return {"message": "Products imported successfully"}
 
 
-@app.get("/products")
+@router.get("/products")
 async def get_products(db: Session = Depends(get_db)):
     products = db.query(Products).all()
     get_products = [{"fx_id": product.fx_id, "code": product.code, "name": product.name, "link": product.link} for product in products]
     return get_products
 
 
-@app.get("/product/{id}")
+@router.get("/product/{id}")
 async def get_product_by_fx_id(id: str, db: Session = Depends(get_db)):
     product = db.query(Products).filter(Products.fx_id == id).first()
     if not product:
         raise HTTPException(status_code=404, detail="Product not found")
     get_product = {"id": product.fx_id, "code": product.code, "name": product.name, "link": product.link}
     return get_product
+
+
+app.include_router(router)
