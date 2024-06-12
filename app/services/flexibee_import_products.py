@@ -1,7 +1,7 @@
 import requests
 import os
 from dotenv import load_dotenv
-from app.db.flexibee_data import get_data
+from app.services.flexibee_data import get_data
 import functools
 import time
 from typing import Callable, Any
