@@ -1,6 +1,6 @@
 from fastapi import FastAPI, Depends
 from app.utils.authentication import verify_token
-from app.db.flexibee_api_url import get_data as import_products_function
+from app.services.flexibee_import_products import get_data as import_products_function
 
 app = FastAPI()
 
